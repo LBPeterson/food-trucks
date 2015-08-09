@@ -29,7 +29,7 @@
       </div>
   </div>-->
 
-  <div id="map" class="splash-container"></div>
+  {{> map }}
 
   <div class="content-wrapper">
       <div class="ribbon l-box-lrg pure-g">
@@ -102,6 +102,7 @@
                   <p>
                       <img src="http://www.meteor.com/meteor-logo.png" style="width:100%; max-width:300px; margin:auto; display: block;"/>
                       <img src="http://leafletjs.com/docs/images/logo.png" style="width:100%; max-width:300px; margin:auto; display: block;"/>
+                      <img src="http://purecss.io/img/logo_pure@2x.png" style="width:100%; max-width:300px; margin:auto; display: block;"/>
                       <h3 class="is-center">&copy; <a href="http://lukenotomatoes.github.io">Luke Peterson</a> 2015</h3>
                   </p>
               </div>
@@ -110,70 +111,6 @@
       </div>
 
   </div>
-  <div data-params='{"trucks":[{{#each markers}}{{> marker}}{{/each}}[]]}' id="TEST"></div>
-  <script>
-    var map;
-    var marker;
-
-    var locations = [
-      {{#each markers}}
-        {{> marker}}
-      {{/each}}
-      []
-    ];
-    console.log("inline");
-
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(success, error);
-    } else {
-      error();
-    }
-
-    function addLayer(){
-      L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-  			    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-  		}).addTo(map);
-      console.log("addlayer");
-    }
-    function addMarkers() {
-      map.on('click', function(e) {
-        document.getElementById("lat").value = e.latlng.lat;
-        document.getElementById("long").value = e.latlng.lng;
-        if(typeof(marker)==='undefined')
-          {
-            marker = new L.marker(e.latlng);
-            marker.addTo(map);
-          } else {
-            marker.setLatLng(e.latlng);
-          }
-      });
-      console.log("addclick");
-
-      json = document.getElementById("TEST").dataset.params;
-      obj = JSON.parse(json);
-      loc = obj.trucks;
-      for (var i = 0; i &lt; (loc.length)-1; i++) {
-        var text = loc[i][0].name+"<br />"+
-                    loc[i][0].type+"<br />" +
-                    "Open: "+loc[i][0].open +" to "+loc[i][0].close;
-        var location = new L.marker([loc[i][0].lat,loc[i][0].long])
-          .bindPopup(text)
-          .addTo(map);
-      }
-      console.log("addmarker");
-    }
-
-    function success(position) {
-      map = L.map('map').setView([position.coords.latitude, position.coords.longitude], 16);
-      addLayer();
-    }
-    function error() {
-      map = L.map('map').setView([44.9778, -93.2650], 12);
-      addLayer();
-    }
-
-  </script>
 </body>
 
 <template name="truck">
@@ -186,9 +123,9 @@
     <td>{{long}}</td>
   </tr>
 </template>
-<template name="marker">
-  [{"name":"{{name}}", "type":"{{type}}", "open":"{{start}}",
-    "close":"{{end}}", "lat":{{lat}}, "long":{{long}} }],
+
+<template name="map">
+      <div id="map" class="map splash-container"></div>
 </template>
 <!-- TODOS
   Isolate database

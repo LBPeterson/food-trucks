@@ -2,22 +2,33 @@ Trucks = new Mongo.Collection("trucks");
 
 if (Meteor.isClient) {
   // This code only runs on the client
-  var myLat;
-  var myLon;
-  function getLocation(){
-    if (navigator.geolocation)
-    {
-      navigator.geolocation.getCurrentPosition(showPosition, showError);
+
+  Template.map.rendered = function() {
+    L.Icon.Default.imagePath = 'packages/bevanhunt_leaflet/images';
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+      map = L.map('map', {doubleClickZoom: false}).setView([44.9778, -93.2650], 12);
+      setMap();
     }
-    else{
-      alert("Geolocation is needed for this app to work");
+
+    function showPosition(position) {
+      map = L.map('map', {doubleClickZoom: false}).setView([position.coords.latitude, position.coords.longitude], 16);
+      setMap()
+    }
+
+    function setMap(){
+      L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+      map.on('dblclick', function(event) {
+        document.getElementById("lat").value = event.latlng.lat;
+        document.getElementById("long").value = event.latlng.lng;
+      });
     }
   }
-  function showPosition(position)
-  {
-    myLat = position.coords.latitude;
-    myLon = position.coords.longitude;
-  }
+
   Template.body.helpers({
     trucks: function () {
       return Trucks.find({createdAt: new Date().toDateString()}, {
@@ -31,9 +42,6 @@ if (Meteor.isClient) {
         sort: {createdAt: -1}
       });
     }
-  });
-  Template.marker.onRendered(function(){
-    addMarkers();
   });
 
   Template.body.events({
