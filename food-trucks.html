@@ -2,7 +2,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="A layout example that shows off a responsive product landing page.">
-  <title>food-trucks</title>
+  <title>Nearby Food Trucks</title>
   <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
 
   <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
@@ -21,6 +21,19 @@
       <!--[if gt IE 8]><!-->
           <link rel="stylesheet" href="css/layouts/marketing.css">
       <!--<![endif]-->
+
+      <link rel="apple-touch-icon" sizes="57x57" href="/favicons/apple-touch-icon-57x57.png">
+      <link rel="apple-touch-icon" sizes="60x60" href="/favicons/apple-touch-icon-60x60.png">
+      <link rel="apple-touch-icon" sizes="72x72" href="/favicons/apple-touch-icon-72x72.png">
+      <link rel="apple-touch-icon" sizes="76x76" href="/favicons/apple-touch-icon-76x76.png">
+      <link rel="apple-touch-icon" sizes="114x114" href="/favicons/apple-touch-icon-114x114.png">
+      <link rel="apple-touch-icon" sizes="120x120" href="/favicons/apple-touch-icon-120x120.png">
+      <link rel="icon" type="image/png" href="/favicons/favicon-32x32.png" sizes="32x32">
+      <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96">
+      <link rel="icon" type="image/png" href="/favicons/favicon-16x16.png" sizes="16x16">
+      <link rel="manifest" href="/favicons/manifest.json">
+      <meta name="msapplication-TileColor" content="#2b5797">
+      <meta name="theme-color" content="#ffffff">
 </head>
 <body>
   <!--<div class="header">
@@ -33,7 +46,7 @@
 
   <div class="content-wrapper">
       <div class="ribbon l-box-lrg pure-g">
-          <div class="pure-u-1 pure-u-md-1-2 pure-u-lg-3-5">
+          <div class="pure-u-1">
 
               <h2 class="content-head content-head-ribbon">Find your local food trucks &darr;</h2>
 
@@ -46,8 +59,7 @@
                   <th>Type</th>
                   <th>Start Time</th>
                   <th>End Time</th>
-                  <th>Latitude</th>
-                  <th>Longitude</th>
+                  <th>Distance</th>
                 </tr>
                 {{#each trucks}}
                   {{> truck}}
@@ -57,9 +69,11 @@
       </div>
 
       <div class="content">
-          <h2 class="content-head is-center">{{> loginButtons}} to add your own truck</h2>
+          <h2 class="content-head is-center">{{> loginButtons}}{{#unless currentUser}} to add your own truck{{/unless}}</h2>
+
 
           <div class="pure-g">
+            {{#if currentUser}}
               <div class="l-box-lrg pure-u-1 pure-u-md-2-5">
                   <form id="addNew" class="pure-form pure-form-stacked">
                       <label for="name">Name</label>
@@ -74,7 +88,7 @@
                       <label for="endTime">End Time</label>
                       <input id="endTime" name="endTime" type="time" required>
 
-                      <br><h3 class="is-center">Click on the map to select location</h3>
+                      <br><h3 class="is-center">Double click on the map to select location</h3>
 
                       <label for="lat">Latitude</label>
                       <input id="lat" name="lat" type="text" required>
@@ -82,15 +96,12 @@
                       <label for="long">Longitude</label>
                       <input id="long" name="long" type="text" required>
 
-                      {{#if currentUser}}
-                        <input type="submit">
-                      {{else}}
-                        <h3 class="is-center">Login to submit</h3>
-                      {{/if}}
+                      <input type="submit">
                   </form>
               </div>
+              {{/if}}
 
-              <div class="l-box-lrg pure-u-1 pure-u-md-3-5">
+              <div class="l-box-lrg pure-u-1 {{#if currentUser}}pure-u-md-3-5{{else}}is-center{{/if}}">
                   <h4>About</h4>
                   <p>
                       This is a site dedicated to finding food trucks in your area.
@@ -99,12 +110,13 @@
                   </p>
 
                   <h4>Credits</h4>
-                  <p>
-                      <img src="http://www.meteor.com/meteor-logo.png" style="width:100%; max-width:300px; margin:auto; display: block;"/>
-                      <img src="http://leafletjs.com/docs/images/logo.png" style="width:100%; max-width:300px; margin:auto; display: block;"/>
-                      <img src="http://purecss.io/img/logo_pure@2x.png" style="width:100%; max-width:300px; margin:auto; display: block;"/>
-                      <h3 class="is-center">&copy; <a href="http://lukenotomatoes.github.io">Luke Peterson</a> 2015</h3>
-                  </p>
+                      <img src="http://www.meteor.com/meteor-logo.png" style="height:1.5em; margin-bottom:.75em; display: block;"/>
+                      <img src="http://leafletjs.com/docs/images/logo.png" style="height:1.5em; margin-bottom:.75em; display: block;"/>
+                      <img src="http://purecss.io/img/logo_pure@2x.png" style="height:1.5em; margin-bottom:.75em; display: block;"/>
+
+                      <img src="/truck.png" style="height:1em" /> Truck by John Caserta from the Noun Project<br>
+                      <img src="/pin.png" style="height:1em" /> Map Marker by Housin Aziz from the Noun Project
+                      <h3>&copy; <a href="http://lukenotomatoes.github.io">Luke Peterson</a> 2015</h3>
               </div>
           </div>
 
@@ -119,8 +131,6 @@
     <td>{{type}}</td>
     <td>{{start}}</td>
     <td>{{end}}</td>
-    <td>{{lat}}</td>
-    <td>{{long}}</td>
   </tr>
 </template>
 
@@ -128,9 +138,6 @@
       <div id="map" class="map splash-container"></div>
 </template>
 <!-- TODOS
-  Isolate database
-
   display/load only sites within 5 miles of center of map
-  markers & popups on map
   delete old db entries
 -->
