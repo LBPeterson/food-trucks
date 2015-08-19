@@ -126,11 +126,12 @@
 </body>
 
 <template name="truck">
-  <tr>
+  <tr class="distance">
     <td>{{name}}</td>
     <td>{{type}}</td>
     <td>{{start}}</td>
     <td>{{end}}</td>
+    <td>{{distance}}</td>
   </tr>
 </template>
 
@@ -140,4 +141,5 @@
 <!-- TODOS
   display/load only sites within 5 miles of center of map
   delete old db entries
+  publish/subscribe
 -->

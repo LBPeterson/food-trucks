@@ -3,9 +3,10 @@ Trucks = new Mongo.Collection("trucks");
 if (Meteor.isClient) {
   // This code only runs on the client
   var trucks = Trucks.find({}, {
-    limit: 3,
+    limit: 4,
     sort: {createdAt: -1}
   });
+
   //createdAt: new Date().toDateString()
 
   Template.map.rendered = function() {
@@ -20,7 +21,9 @@ if (Meteor.isClient) {
     }
 
     function showPosition(position) {
-      map = L.map('map', {doubleClickZoom: false}).setView([position.coords.latitude, position.coords.longitude], 16);
+      mapLat = position.coords.latitude;
+      mapLong = position.coords.longitude;
+      map = L.map('map', {doubleClickZoom: false}).setView([mapLat, mapLong], 16);
       setMap();
     }
 
@@ -75,6 +78,9 @@ if (Meteor.isClient) {
 
       // Prevent default form submit
       return false;
+    },
+    "click .distance": function (event) {
+      console.log(distance(this.lat, this.long, mapLat, mapLong));
     }
   });
 }
@@ -99,3 +105,13 @@ Meteor.methods({
     });
   }
 });
+
+function distance(lat1, lon1, lat2, lon2) {
+  var R = 6371;
+  var a =
+     0.5 - Math.cos((lat2 - lat1) * Math.PI / 180)/2 +
+     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+     (1 - Math.cos((lon2 - lon1) * Math.PI / 180))/2;
+
+  return R * 2 * Math.asin(Math.sqrt(a));
+}
