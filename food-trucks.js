@@ -12,6 +12,7 @@ if (Meteor.isClient) {
   Template.map.rendered = function() {
     L.Icon.Default.imagePath = 'packages/bevanhunt_leaflet/images';
 
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
 
